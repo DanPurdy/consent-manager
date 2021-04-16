@@ -151,8 +151,8 @@ All the options are supported. The callback function also receives these exports
 ```html
 <script>
   window.consentManagerConfig = function(exports) {
-    var React = exports.React
-    var inEU = exports.inEU
+    var React = exports.React;
+    var inEU = exports.inEU;
 
     var bannerContent = React.createElement(
       'span',
@@ -161,31 +161,35 @@ All the options are supported. The callback function also receives these exports
       ' ',
       React.createElement(
         'a',
-        { href: '/docs/legal/website-data-collection-policy/', target: '_blank' },
-        'Website Data Collection Policy'
+        {
+          href: '/docs/legal/website-data-collection-policy/',
+          target: '_blank',
+        },
+        'Website Data Collection Policy',
       ),
-      '.'
-    )
-    var bannerSubContent = 'You can change your preferences at any time.'
-    var preferencesDialogTitle = 'Website Data Collection Preferences'
+      '.',
+    );
+    var bannerSettingsButtonContent =
+      'You can change your preferences at any time.';
+    var preferencesDialogTitle = 'Website Data Collection Preferences';
     var preferencesDialogContent =
-      'We use data collected by cookies and JavaScript libraries to improve your browsing experience, analyze site traffic, deliver personalized advertisements, and increase the overall performance of our site.'
-    var cancelDialogTitle = 'Are you sure you want to cancel?'
+      'We use data collected by cookies and JavaScript libraries to improve your browsing experience, analyze site traffic, deliver personalized advertisements, and increase the overall performance of our site.';
+    var cancelDialogTitle = 'Are you sure you want to cancel?';
     var cancelDialogContent =
-      'Your preferences have not been saved. By continuing to use our website, you՚re agreeing to our Website Data Collection Policy.'
+      'Your preferences have not been saved. By continuing to use our website, you՚re agreeing to our Website Data Collection Policy.';
 
     return {
       container: '#target-container',
       writeKey: '<your-segment-write-key>',
       shouldRequireConsent: inEU,
       bannerContent: bannerContent,
-      bannerSubContent: bannerSubContent,
+      bannerSettingsButtonContent: bannerSettingsButtonContent,
       preferencesDialogTitle: preferencesDialogTitle,
       preferencesDialogContent: preferencesDialogContent,
       cancelDialogTitle: cancelDialogTitle,
-      cancelDialogContent: cancelDialogContent
-    }
-  }
+      cancelDialogContent: cancelDialogContent,
+    };
+  };
 </script>
 
 <script
@@ -219,30 +223,6 @@ Type: `function`<br>
 Default: `() => true`
 
 Callback function that determines if consent is required before tracking can begin. Return `true` to show the consent banner and wait for consent (if no consent has been given yet). Return `false` to not show the consent banner and start tracking immediately (unless the user has opted out). The function can return a `Promise` that resolves to a boolean.
-
-##### closeBehavior
-
-Type: `enum|string` or `function`<br>
-Default: `dismiss`
-
-An option to determine what should be the default behavior for the `x` button on the consent manager banner.
-
-Options:
-
-- `dismiss` (default) - Dismisses the banner, but don't save or change any preferences. Analytics.js won't be loaded until explicit consent is given.
-- `accept` - Assume consent across every category.
-- `deny` - Denies consent across every category.
-
-`closeBehavior` can also be customized - i.e. don't load some categories, but load everything else. For example, if you wanted to load everything _except_ advertising, you could pass the following as `closeBehavior`:
-
-```
-closeBehavior={
-  (categories) => ({
-    ...categories,
-    advertising: false
-  })
-}
-```
 
 ##### implyConsentOnInteraction
 
@@ -281,7 +261,7 @@ Type: `PropTypes.node`
 
 The consent of the consent banner.
 
-##### bannerSubContent
+##### bannerSettingsButtonContent
 
 Type: `PropTypes.node`
 
@@ -337,10 +317,11 @@ An object representing custom consent categories - mapping custom categories to 
 ```javascript
 const customCategories = {
   'New Category': {
-    purpose: 'A new consent category to capture more granular consent groupings',
-    integrations: ['Google Adwords (Classic)', 'Amplitude', 'Slack']
-  }
-}
+    purpose:
+      'A new consent category to capture more granular consent groupings',
+    integrations: ['Google Adwords (Classic)', 'Amplitude', 'Slack'],
+  },
+};
 ```
 
 The values for `integrations` should be an integration's creationName (`integration.creationName`). You can find examples of that by going to `https://cdn.segment.com/v1/projects/<writeKey>/integrations`
@@ -348,28 +329,30 @@ The values for `integrations` should be an integration's creationName (`integrat
 #### Example
 
 ```javascript
-import React from 'react'
-import { ConsentManager, openConsentManager } from '@segment/consent-manager'
-import inEU from '@segment/in-eu'
+import React from 'react';
+import { ConsentManager, openConsentManager } from '@segment/consent-manager';
+import inEU from '@segment/in-eu';
 
 export default function() {
   const bannerContent = (
     <span>
-      We use cookies (and other similar technologies) to collect data to improve your experience on
-      our site. By using our website, you’re agreeing to the collection of data as described in our{' '}
+      We use cookies (and other similar technologies) to collect data to improve
+      your experience on our site. By using our website, you’re agreeing to the
+      collection of data as described in our{' '}
       <a href="/docs/legal/website-data-collection-policy/" target="_blank">
         Website Data Collection Policy
       </a>
       .
     </span>
-  )
-  const bannerSubContent = 'You can change your preferences at any time.'
-  const preferencesDialogTitle = 'Website Data Collection Preferences'
+  );
+  const bannerSettingsButtonContent =
+    'You can change your preferences at any time.';
+  const preferencesDialogTitle = 'Website Data Collection Preferences';
   const preferencesDialogContent =
-    'We use data collected by cookies and JavaScript libraries to improve your browsing experience, analyze site traffic, deliver personalized advertisements, and increase the overall performance of our site.'
-  const cancelDialogTitle = 'Are you sure you want to cancel?'
+    'We use data collected by cookies and JavaScript libraries to improve your browsing experience, analyze site traffic, deliver personalized advertisements, and increase the overall performance of our site.';
+  const cancelDialogTitle = 'Are you sure you want to cancel?';
   const cancelDialogContent =
-    'Your preferences have not been saved. By continuing to use our website, you՚re agreeing to our Website Data Collection Policy.'
+    'Your preferences have not been saved. By continuing to use our website, you՚re agreeing to our Website Data Collection Policy.';
 
   return (
     <div>
@@ -377,7 +360,7 @@ export default function() {
         writeKey="<your-segment-write-key>"
         shouldRequireConsent={inEU}
         bannerContent={bannerContent}
-        bannerSubContent={bannerSubContent}
+        bannerSettingsButtonContent={bannerSettingsButtonContent}
         preferencesDialogTitle={preferencesDialogTitle}
         preferencesDialogContent={preferencesDialogContent}
         cancelDialogTitle={cancelDialogTitle}
@@ -388,7 +371,7 @@ export default function() {
         Website Data Collection Preferences
       </button>
     </div>
-  )
+  );
 }
 ```
 
@@ -554,8 +537,8 @@ Saves the preferences currently in state to a cookie called `tracking-preference
 For a more detailed/advanced example, checkout the [ConsentManager implementation][].
 
 ```javascript
-import React from 'react'
-import { ConsentManagerBuilder } from '@segment/consent-manager'
+import React from 'react';
+import { ConsentManagerBuilder } from '@segment/consent-manager';
 
 export default function() {
   return (
@@ -572,7 +555,7 @@ export default function() {
                     checked={Boolean(preferences[destination.id])}
                     onChange={() =>
                       setPreferences({
-                        [destination.id]: !preferences[destination.id]
+                        [destination.id]: !preferences[destination.id],
                       })
                     }
                   />
@@ -594,7 +577,7 @@ export default function() {
         </div>
       )}
     </ConsentManagerBuilder>
-  )
+  );
 }
 ```
 

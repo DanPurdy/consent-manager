@@ -1,17 +1,26 @@
-import React, { PureComponent } from 'react'
-import ConsentManagerBuilder from '../consent-manager-builder'
-import Container from './container'
-import { ADVERTISING_CATEGORIES, FUNCTIONAL_CATEGORIES } from './categories'
-import { CategoryPreferences, Destination, ConsentManagerProps } from '../types'
+import React, { PureComponent } from 'react';
+import ConsentManagerBuilder from '../consent-manager-builder';
+import Container from './container';
+import { ADVERTISING_CATEGORIES, FUNCTIONAL_CATEGORIES } from './categories';
+import {
+  CategoryPreferences,
+  Destination,
+  ConsentManagerProps,
+} from '../types';
 
 const zeroValuePreferences: CategoryPreferences = {
   marketingAndAnalytics: null,
   advertising: null,
-  functional: null
-}
+  functional: null,
+};
 
-export default class ConsentManager extends PureComponent<ConsentManagerProps, {}> {
-  static displayName = 'ConsentManager'
+export default class ConsentManager extends PureComponent<
+  ConsentManagerProps,
+  {}
+> {
+  static displayName = 'ConsentManager';
+
+  props: ConsentManagerProps;
 
   static defaultProps = {
     otherWriteKeys: [],
@@ -20,13 +29,14 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
     onError: undefined,
     cookieDomain: undefined,
     customCategories: undefined,
-    bannerTextColor: '#fff',
-    bannerSubContent: 'You can change your preferences at any time.',
-    bannerBackgroundColor: '#1f4160',
+    bannerTextColor: '#404040',
+    bannerSettingsButtonContent: 'You can change your preferences at any time.',
+    bannerBackgroundColor: '#ffffff',
     preferencesDialogTitle: 'Website Data Collection Preferences',
     cancelDialogTitle: 'Are you sure you want to cancel?',
-    defaultDestinationBehavior: 'disable'
-  }
+    defaultDestinationBehavior: 'disable',
+    preferenceDialogTranslations: {},
+  };
 
   render() {
     const {
@@ -36,7 +46,8 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
       implyConsentOnInteraction,
       cookieDomain,
       bannerContent,
-      bannerSubContent,
+      bannerAcceptButtonContent,
+      bannerSettingsButtonContent,
       bannerTextColor,
       bannerBackgroundColor,
       preferencesDialogTitle,
@@ -46,8 +57,9 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
       customCategories,
       defaultDestinationBehavior,
       cdnHost,
-      onError
-    } = this.props
+      onError,
+      preferenceDialogTranslations,
+    } = this.props;
 
     return (
       <ConsentManagerBuilder
@@ -72,7 +84,7 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
           resetPreferences,
           saveConsent,
           havePreferencesChanged,
-          workspaceAddedNewDestinations
+          workspaceAddedNewDestinations,
         }) => {
           return (
             <Container
@@ -86,13 +98,18 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
               saveConsent={saveConsent}
               closeBehavior={this.props.closeBehavior}
               implyConsentOnInteraction={
-                implyConsentOnInteraction ?? ConsentManager.defaultProps.implyConsentOnInteraction
+                implyConsentOnInteraction ??
+                ConsentManager.defaultProps.implyConsentOnInteraction
               }
               bannerContent={bannerContent}
-              bannerSubContent={bannerSubContent}
-              bannerTextColor={bannerTextColor || ConsentManager.defaultProps.bannerTextColor}
+              bannerAcceptButtonContent={bannerAcceptButtonContent}
+              bannerSettingsButtonContent={bannerSettingsButtonContent}
+              bannerTextColor={
+                bannerTextColor || ConsentManager.defaultProps.bannerTextColor
+              }
               bannerBackgroundColor={
-                bannerBackgroundColor || ConsentManager.defaultProps.bannerBackgroundColor
+                bannerBackgroundColor ||
+                ConsentManager.defaultProps.bannerBackgroundColor
               }
               preferencesDialogTitle={preferencesDialogTitle}
               preferencesDialogContent={preferencesDialogContent}
@@ -101,71 +118,79 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
               havePreferencesChanged={havePreferencesChanged}
               defaultDestinationBehavior={defaultDestinationBehavior}
               workspaceAddedNewDestinations={workspaceAddedNewDestinations}
+              preferenceDialogTranslations={preferenceDialogTranslations}
             />
-          )
+          );
         }}
       </ConsentManagerBuilder>
-    )
+    );
   }
 
   getInitialPreferences = () => {
-    const { initialPreferences, customCategories } = this.props
+    const { initialPreferences, customCategories } = this.props;
     if (initialPreferences) {
-      return initialPreferences
+      return initialPreferences;
     }
 
     if (!customCategories) {
-      return zeroValuePreferences
+      return zeroValuePreferences;
     }
 
-    const initialCustomPreferences = {}
+    const initialCustomPreferences = {};
     Object.keys(customCategories).forEach(category => {
-      initialCustomPreferences[category] = null
-    })
+      initialCustomPreferences[category] = null;
+    });
 
-    return initialCustomPreferences
-  }
+    return initialCustomPreferences;
+  };
 
-  handleMapCustomPreferences = (destinations: Destination[], preferences: CategoryPreferences) => {
-    const { customCategories } = this.props
-    const destinationPreferences = {}
-    const customPreferences = {}
+  handleMapCustomPreferences = (
+    destinations: Destination[],
+    preferences: CategoryPreferences,
+  ) => {
+    const { customCategories } = this.props;
+    const destinationPreferences = {};
+    const customPreferences = {};
 
     if (customCategories) {
       for (const preferenceName of Object.keys(customCategories)) {
-        const value = preferences[preferenceName]
+        const value = preferences[preferenceName];
         if (typeof value === 'boolean') {
-          customPreferences[preferenceName] = value
+          customPreferences[preferenceName] = value;
         } else {
-          customPreferences[preferenceName] = true
+          customPreferences[preferenceName] = true;
         }
       }
 
       destinations.forEach(destination => {
         // Mark custom categories
-        Object.entries(customCategories).forEach(([categoryName, { integrations }]) => {
-          const consentAlreadySetToFalse = destinationPreferences[destination.id] === false
-          const shouldSetConsent = integrations.includes(destination.id)
-          if (shouldSetConsent && !consentAlreadySetToFalse) {
-            destinationPreferences[destination.id] = customPreferences[categoryName]
-          }
-        })
-      })
+        Object.entries(customCategories).forEach(
+          ([categoryName, { integrations }]) => {
+            const consentAlreadySetToFalse =
+              destinationPreferences[destination.id] === false;
+            const shouldSetConsent = integrations.includes(destination.id);
+            if (shouldSetConsent && !consentAlreadySetToFalse) {
+              destinationPreferences[destination.id] =
+                customPreferences[categoryName];
+            }
+          },
+        );
+      });
 
-      return { destinationPreferences, customPreferences }
+      return { destinationPreferences, customPreferences };
     }
 
     // Default unset preferences to true (for implicit consent)
     for (const preferenceName of Object.keys(preferences)) {
-      const value = preferences[preferenceName]
+      const value = preferences[preferenceName];
       if (typeof value === 'boolean') {
-        customPreferences[preferenceName] = value
+        customPreferences[preferenceName] = value;
       } else {
-        customPreferences[preferenceName] = true
+        customPreferences[preferenceName] = true;
       }
     }
 
-    const customPrefs = customPreferences as CategoryPreferences
+    const customPrefs = customPreferences as CategoryPreferences;
 
     for (const destination of destinations) {
       // Mark advertising destinations
@@ -173,7 +198,7 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
         ADVERTISING_CATEGORIES.find(c => c === destination.category) &&
         destinationPreferences[destination.id] !== false
       ) {
-        destinationPreferences[destination.id] = customPrefs.advertising
+        destinationPreferences[destination.id] = customPrefs.advertising;
       }
 
       // Mark function destinations
@@ -181,15 +206,16 @@ export default class ConsentManager extends PureComponent<ConsentManagerProps, {
         FUNCTIONAL_CATEGORIES.find(c => c === destination.category) &&
         destinationPreferences[destination.id] !== false
       ) {
-        destinationPreferences[destination.id] = customPrefs.functional
+        destinationPreferences[destination.id] = customPrefs.functional;
       }
 
       // Fallback to marketing
       if (!(destination.id in destinationPreferences)) {
-        destinationPreferences[destination.id] = customPrefs.marketingAndAnalytics
+        destinationPreferences[destination.id] =
+          customPrefs.marketingAndAnalytics;
       }
     }
 
-    return { destinationPreferences, customPreferences }
-  }
+    return { destinationPreferences, customPreferences };
+  };
 }

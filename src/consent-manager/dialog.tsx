@@ -1,13 +1,13 @@
-import React, { PureComponent } from 'react'
-import ReactDOM from 'react-dom'
-import styled, { keyframes } from 'react-emotion'
-import nanoid from 'nanoid'
-import fontStyles from './font-styles'
+import React, { ComponentPropsWithRef, PureComponent } from 'react';
+import ReactDOM from 'react-dom';
+import styled, { keyframes } from 'styled-components';
+import nanoid from 'nanoid';
+import fontStyles from './font-styles';
 
-const ANIMATION_DURATION = '200ms'
-const ANIMATION_EASING = 'cubic-bezier(0.0, 0.0, 0.2, 1)'
+const ANIMATION_DURATION = '200ms';
+const ANIMATION_EASING = 'cubic-bezier(0.0, 0.0, 0.2, 1)';
 
-const Overlay = styled('div')`
+const Overlay = styled.div`
   position: fixed;
   left: 0;
   right: 0;
@@ -18,7 +18,7 @@ const Overlay = styled('div')`
   align-items: center;
   justify-content: center;
   background: rgba(67, 90, 111, 0.699);
-`
+`;
 
 const openAnimation = keyframes`
   from {
@@ -29,9 +29,13 @@ const openAnimation = keyframes`
     transform: scale(1);
     opacity: 1;
   }
-`
+`;
 
-const Root = styled<{ width: number | string | undefined }, 'section'>('section')`
+interface RootProps extends ComponentPropsWithRef<'section'> {
+  width: number | string | undefined;
+}
+
+const Root = styled.section<RootProps>`
   ${fontStyles};
   display: flex;
   flex-direction: column;
@@ -42,43 +46,32 @@ const Root = styled<{ width: number | string | undefined }, 'section'>('section'
   background: #fff;
   border-radius: 8px;
   animation: ${openAnimation} ${ANIMATION_DURATION} ${ANIMATION_EASING} both;
-`
+`;
 
-const Form = styled('form')`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
   min-height: 0;
-`
+`;
 
-const Header = styled('div')`
+const Header = styled.div`
   flex: 1 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(67, 90, 111, 0.079);
-`
+`;
 
-const Title = styled('h2')`
+const Title = styled.h2`
   margin: 0;
   color: #1f4160;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
-`
+`;
 
-const HeaderCancelButton = styled('button')`
-  padding: 8px;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
-  font-size: 14px;
-  line-height: 1;
-  cursor: pointer;
-`
-
-const Content = styled('div')`
+const Content = styled.div`
   overflow-y: auto;
   padding: 16px;
   padding-bottom: 0;
@@ -102,51 +95,47 @@ const Content = styled('div')`
       color: #248953;
     }
   }
-`
+`;
 
-const Buttons = styled('div')`
+const Buttons = styled.div`
   padding: 16px;
   text-align: right;
-`
+`;
 
 interface DialogProps {
-  innerRef: (element: HTMLElement | null) => void
-  onCancel?: () => void
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-  title: React.ReactNode
-  buttons: React.ReactNode
-  width?: string
+  onCancel?: () => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  title: React.ReactNode;
+  buttons: React.ReactNode;
+  width?: string;
 }
 
 export default class Dialog extends PureComponent<DialogProps, {}> {
-  static displayName = 'Dialog'
-  private titleId: string
-  private container: HTMLElement
-  private root: HTMLElement
-  private form: HTMLFormElement
+  static displayName = 'Dialog';
+  private titleId: string;
+  private container: HTMLElement;
+  private form: HTMLFormElement;
 
   static defaultProps = {
-    onCancel: undefined,
-    width: '750px'
-  }
+    width: '750px',
+  };
 
   constructor(props: DialogProps) {
-    super(props)
+    super(props);
 
-    this.titleId = nanoid()
-    this.container = document.createElement('div')
-    this.container.setAttribute('data-consent-manager-dialog', '')
+    this.titleId = nanoid();
+    this.container = document.createElement('div');
+    this.container.setAttribute('data-consent-manager-dialog', '');
 
-    document.body.appendChild(this.container)
+    document.body.appendChild(this.container);
   }
 
   render() {
-    const { onCancel, onSubmit, title, children, buttons, width } = this.props
+    const { onSubmit, title, children, buttons, width } = this.props;
 
     const dialog = (
-      <Overlay onClick={this.handleOverlayClick}>
+      <Overlay>
         <Root
-          innerRef={this.handleRootRef}
           role="dialog"
           aria-modal
           aria-labelledby={this.titleId}
@@ -154,69 +143,38 @@ export default class Dialog extends PureComponent<DialogProps, {}> {
         >
           <Header>
             <Title id={this.titleId}>{title}</Title>
-            {onCancel && (
-              <HeaderCancelButton onClick={onCancel} title="Cancel" aria-label="Cancel">
-                ✕
-              </HeaderCancelButton>
-            )}
           </Header>
 
-          <Form innerRef={this.handleFormRef} onSubmit={onSubmit}>
+          <Form ref={this.handleFormRef} onSubmit={onSubmit}>
             <Content>{children}</Content>
 
             <Buttons>{buttons}</Buttons>
           </Form>
         </Root>
       </Overlay>
-    )
+    );
 
-    return ReactDOM.createPortal(dialog, this.container)
+    return ReactDOM.createPortal(dialog, this.container);
   }
 
   componentDidMount() {
-    const { innerRef } = this.props
-
     if (this.form) {
-      const input: HTMLInputElement | null = this.form.querySelector('input,button')
+      const input: HTMLInputElement | null = this.form.querySelector(
+        'input,button',
+      );
       if (input) {
-        input.focus()
+        input.focus();
       }
     }
-
-    document.body.addEventListener('keydown', this.handleEsc, false)
-    document.body.style.overflow = 'hidden'
-    innerRef(this.container)
+    document.body.style.overflow = 'hidden';
   }
 
   componentWillUnmount() {
-    const { innerRef } = this.props
-    document.body.removeEventListener('keydown', this.handleEsc, false)
-    document.body.style.overflow = ''
-    document.body.removeChild(this.container)
-    innerRef(null)
-  }
-
-  handleRootRef = (node: HTMLElement) => {
-    this.root = node
+    document.body.style.overflow = '';
+    document.body.removeChild(this.container);
   }
 
   handleFormRef = (node: HTMLFormElement) => {
-    this.form = node
-  }
-
-  handleOverlayClick = e => {
-    const { onCancel } = this.props
-    // Ignore propogated clicks from inside the dialog
-    if (onCancel && this.root && !this.root.contains(e.target)) {
-      onCancel()
-    }
-  }
-
-  handleEsc = (e: KeyboardEvent) => {
-    const { onCancel } = this.props
-    // Esc key
-    if (onCancel && e.keyCode === 27) {
-      onCancel()
-    }
-  }
+    this.form = node;
+  };
 }
