@@ -1,5 +1,5 @@
 {
-  "name": "@danpurdy/constent-manager",
+  "name": "@danpurdy/consent-manager",
   "version": "5.1.0",
   "description": "Drop-in consent management plugin for analytics.js",
   "keywords": [
@@ -20,6 +20,9 @@
     "standalone",
     "types"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "jest src/__tests__",
     "prepublishOnly": "npm run clean && npm run build",
