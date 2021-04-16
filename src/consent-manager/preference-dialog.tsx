@@ -35,7 +35,7 @@ const ColumnHeading = styled.th<{ hideOnMobile?: boolean }>`
   ${props => (props.hideOnMobile ? hideOnMobile : '')}
 `;
 
-const DesktopOnlyTD = styled.p`
+const DesktopOnlyTD = styled.td`
   ${hideOnMobile}
 `;
 
