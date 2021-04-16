@@ -1,11 +1,11 @@
-const webpack = require('webpack')
-const pkg = require('../package.json')
+const webpack = require('webpack');
+const pkg = require('../package.json');
 
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
   },
   module: {
     rules: [
@@ -16,28 +16,24 @@ module.exports = {
             loader: require.resolve('@storybook/source-loader'),
             options: {
               parser: 'typescript',
-              prettierConfig: {
-                printWidth: 100,
-                singleQuote: false
-              }
-            }
-          }
+            },
+          },
         ],
-        enforce: 'pre'
+        enforce: 'pre',
       },
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        loader: 'ts-loader'
-      }
-    ]
+        loader: 'ts-loader',
+      },
+    ],
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
-        VERSION: JSON.stringify(pkg.version)
-      }
-    })
-  ]
-}
+        VERSION: JSON.stringify(pkg.version),
+      },
+    }),
+  ],
+};

@@ -1,39 +1,45 @@
-import React, { PureComponent } from 'react'
-import styled, { css } from 'react-emotion'
-import Dialog from './dialog'
-import { DefaultButton, GreenButton } from './buttons'
-import { Destination, CustomCategories, CategoryPreferences } from '../types'
+import React, { PureComponent } from 'react';
+import styled, { css } from 'styled-components';
+import Dialog from './dialog';
+import { DefaultButton, GreenButton } from './buttons';
+import {
+  Destination,
+  CustomCategories,
+  CategoryPreferences,
+  PreferenceDialogTranslations,
+} from '../types';
 
 const hideOnMobile = css`
   @media (max-width: 600px) {
     display: none;
   }
-`
+`;
 
-const TableScroll = styled('div')`
+const TableScroll = styled.div`
   overflow-x: auto;
   margin-top: 16px;
-`
+`;
 
-const Table = styled('table')`
+const Table = styled.table`
   border-collapse: collapse;
   font-size: 12px;
-`
+`;
 
-const ColumnHeading = styled('th')`
+const ColumnHeading = styled.th<{ hideOnMobile?: boolean }>`
   background: #f7f8fa;
   color: #1f4160;
   font-weight: 600;
   text-align: left;
   border-width: 2px;
-`
 
-const RowHeading = styled('th')`
-  font-weight: normal;
-  text-align: left;
-`
+  ${props => (props.hideOnMobile ? hideOnMobile : '')}
+`;
 
-const Row = styled('tr')`
+const DesktopOnlyTD = styled.p`
+  ${hideOnMobile}
+`;
+
+const Row = styled.tr`
   th,
   td {
     vertical-align: top;
@@ -43,9 +49,9 @@ const Row = styled('tr')`
   td {
     border-top: none;
   }
-`
+`;
 
-const InputCell = styled('td')`
+const InputCell = styled.td`
   input {
     vertical-align: middle;
   }
@@ -54,39 +60,41 @@ const InputCell = styled('td')`
     margin-bottom: 4px;
     white-space: nowrap;
   }
-`
+`;
 
 interface PreferenceDialogProps {
-  innerRef: (element: HTMLElement | null) => void
-  onCancel: () => void
-  onSave: () => void
-  onChange: (name: string, value: boolean) => void
-  marketingDestinations: Destination[]
-  advertisingDestinations: Destination[]
-  functionalDestinations: Destination[]
-  marketingAndAnalytics?: boolean | null
-  advertising?: boolean | null
-  functional?: boolean | null
-  customCategories?: CustomCategories
-  destinations: Destination[]
-  preferences: CategoryPreferences
-  title: React.ReactNode
-  content: React.ReactNode
+  onAcceptAll: () => void;
+  onSave: () => void;
+  onChange: (name: string, value: boolean) => void;
+  marketingDestinations: Destination[];
+  advertisingDestinations: Destination[];
+  functionalDestinations: Destination[];
+  marketingAndAnalytics?: boolean | null;
+  advertising?: boolean | null;
+  functional?: boolean | null;
+  customCategories?: CustomCategories;
+  destinations: Destination[];
+  preferences: CategoryPreferences;
+  title: React.ReactNode;
+  content: React.ReactNode;
+  preferenceDialogTranslations: PreferenceDialogTranslations;
 }
 
-export default class PreferenceDialog extends PureComponent<PreferenceDialogProps, {}> {
-  static displayName = 'PreferenceDialog'
+export default class PreferenceDialog extends PureComponent<
+  PreferenceDialogProps,
+  {}
+> {
+  static displayName = 'PreferenceDialog';
 
   static defaultProps = {
     marketingAndAnalytics: null,
     advertising: null,
-    functional: null
-  }
+    functional: null,
+  };
 
   render() {
     const {
-      innerRef,
-      onCancel,
+      onAcceptAll,
       marketingDestinations,
       advertisingDestinations,
       functionalDestinations,
@@ -97,35 +105,35 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
       destinations,
       title,
       content,
-      preferences
-    } = this.props
+      preferences,
+      preferenceDialogTranslations,
+    } = this.props;
+
     const buttons = (
       <div>
-        <DefaultButton type="button" onClick={onCancel}>
-          Cancel
+        <DefaultButton type="submit">
+          {preferenceDialogTranslations.saveButtonText}
         </DefaultButton>
-        <GreenButton type="submit">Save</GreenButton>
+        <GreenButton type="button" onClick={onAcceptAll}>
+          {preferenceDialogTranslations.acceptAllButtonText}
+        </GreenButton>
       </div>
-    )
+    );
     return (
-      <Dialog
-        innerRef={innerRef}
-        title={title}
-        buttons={buttons}
-        onCancel={onCancel}
-        onSubmit={this.handleSubmit}
-      >
+      <Dialog title={title} buttons={buttons} onSubmit={this.handleSubmit}>
         {content}
-
         <TableScroll>
           <Table>
             <thead>
               <Row>
-                <ColumnHeading scope="col">Allow</ColumnHeading>
-                <ColumnHeading scope="col">Category</ColumnHeading>
-                <ColumnHeading scope="col">Purpose</ColumnHeading>
-                <ColumnHeading scope="col" className={hideOnMobile}>
-                  Tools
+                <ColumnHeading scope="col">
+                  {preferenceDialogTranslations.columnAllowHeadingText}
+                </ColumnHeading>
+                <ColumnHeading scope="col">
+                  {preferenceDialogTranslations.columnCategoryHeadingText}
+                </ColumnHeading>
+                <ColumnHeading scope="col" hideOnMobile>
+                  {preferenceDialogTranslations.columnToolsHeadingText}
                 </ColumnHeading>
               </Row>
             </thead>
@@ -145,7 +153,7 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Allow functional tracking"
                           required
                         />{' '}
-                        Yes
+                        {preferenceDialogTranslations.radioAcceptText}
                       </label>
                       <label>
                         <input
@@ -157,22 +165,18 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Disallow functional tracking"
                           required
                         />{' '}
-                        No
+                        {preferenceDialogTranslations.radioDenyText}
                       </label>
                     </InputCell>
-                    <RowHeading scope="row">Functional</RowHeading>
                     <td>
+                      <p>{preferenceDialogTranslations.functionalTitleText}</p>
                       <p>
-                        To monitor the performance of our site and to enhance your browsing
-                        experience.
-                      </p>
-                      <p className={hideOnMobile}>
-                        For example, these tools enable you to communicate with us via live chat.
+                        {preferenceDialogTranslations.functionalContentText}
                       </p>
                     </td>
-                    <td className={hideOnMobile}>
+                    <DesktopOnlyTD>
                       {functionalDestinations.map(d => d.name).join(', ')}
-                    </td>
+                    </DesktopOnlyTD>
                   </Row>
 
                   <Row>
@@ -187,7 +191,7 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Allow marketing and analytics tracking"
                           required
                         />{' '}
-                        Yes
+                        {preferenceDialogTranslations.radioAcceptText}
                       </label>
                       <label>
                         <input
@@ -199,23 +203,16 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Disallow marketing and analytics tracking"
                           required
                         />{' '}
-                        No
+                        {preferenceDialogTranslations.radioDenyText}
                       </label>
                     </InputCell>
-                    <RowHeading scope="row">Marketing and Analytics</RowHeading>
                     <td>
-                      <p>
-                        To understand user behavior in order to provide you with a more relevant
-                        browsing experience or personalize the content on our site.
-                      </p>
-                      <p className={hideOnMobile}>
-                        For example, we collect information about which pages you visit to help us
-                        present more relevant information.
-                      </p>
+                      <p>{preferenceDialogTranslations.marketingTitleText}</p>
+                      <p>{preferenceDialogTranslations.marketingContentText}</p>
                     </td>
-                    <td className={hideOnMobile}>
+                    <DesktopOnlyTD>
                       {marketingDestinations.map(d => d.name).join(', ')}
-                    </td>
+                    </DesktopOnlyTD>
                   </Row>
 
                   <Row>
@@ -230,7 +227,7 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Allow advertising tracking"
                           required
                         />{' '}
-                        Yes
+                        {preferenceDialogTranslations.radioAcceptText}
                       </label>
                       <label>
                         <input
@@ -242,23 +239,18 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                           aria-label="Disallow advertising tracking"
                           required
                         />{' '}
-                        No
+                        {preferenceDialogTranslations.radioDenyText}
                       </label>
                     </InputCell>
-                    <RowHeading scope="row">Advertising</RowHeading>
                     <td>
+                      <p>{preferenceDialogTranslations.advertisingTitleText}</p>
                       <p>
-                        To personalize and measure the effectiveness of advertising on our site and
-                        other websites.
-                      </p>
-                      <p className={hideOnMobile}>
-                        For example, we may serve you a personalized ad based on the pages you visit
-                        on our site.
+                        {preferenceDialogTranslations.advertisingContentText}
                       </p>
                     </td>
-                    <td className={hideOnMobile}>
+                    <DesktopOnlyTD>
                       {advertisingDestinations.map(d => d.name).join(', ')}
-                    </td>
+                    </DesktopOnlyTD>
                   </Row>
                 </>
               )}
@@ -278,7 +270,7 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                             aria-label={`Allow "${categoryName}" tracking`}
                             required
                           />{' '}
-                          Yes
+                          {preferenceDialogTranslations.radioAcceptText}
                         </label>
                         <label>
                           <input
@@ -290,47 +282,42 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
                             aria-label={`Disallow "${categoryName}" tracking`}
                             required
                           />{' '}
-                          No
+                          {preferenceDialogTranslations.radioDenyText}
                         </label>
                       </InputCell>
-                      <RowHeading scope="row">{categoryName}</RowHeading>
                       <td>
+                        <p>{categoryName}</p>
                         <p>{purpose}</p>
                       </td>
-                      <td className={hideOnMobile}>
+                      <DesktopOnlyTD>
                         {destinations
                           .filter(d => integrations.includes(d.id))
                           .map(d => d.name)
                           .join(', ')}
-                      </td>
+                      </DesktopOnlyTD>
                     </Row>
-                  )
+                  ),
                 )}
 
               <Row>
-                <td>N/A</td>
-                <RowHeading scope="row">Essential</RowHeading>
+                <td></td>
                 <td>
-                  <p>We use browser cookies that are necessary for the site to work as intended.</p>
-                  <p>
-                    For example, we store your website data collection preferences so we can honor
-                    them if you return to our site. You can disable these cookies in your browser
-                    settings but if you do the site may not work as intended.
-                  </p>
+                  <p>{preferenceDialogTranslations.essentialTitleText}</p>
+                  <p>{preferenceDialogTranslations.essentialContentText}</p>
                 </td>
-                <td className={hideOnMobile} />
+                <DesktopOnlyTD />
               </Row>
             </tbody>
           </Table>
         </TableScroll>
       </Dialog>
-    )
+    );
   }
 
   handleChange = e => {
-    const { onChange } = this.props
-    onChange(e.target.name, e.target.value === 'true')
-  }
+    const { onChange } = this.props;
+    onChange(e.target.name, e.target.value === 'true');
+  };
 
   handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const {
@@ -339,25 +326,29 @@ export default class PreferenceDialog extends PureComponent<PreferenceDialogProp
       marketingAndAnalytics,
       advertising,
       functional,
-      customCategories
-    } = this.props
-    e.preventDefault()
+      customCategories,
+    } = this.props;
+    e.preventDefault();
     // Safe guard against browsers that don't prevent the
     // submission of invalid forms (Safari < 10.1)
     if (
       !customCategories &&
-      (marketingAndAnalytics === null || advertising === null || functional === null)
+      (marketingAndAnalytics === null ||
+        advertising === null ||
+        functional === null)
     ) {
-      return
+      return;
     }
 
     // Safe guard against custom categories being null
     if (
       customCategories &&
-      Object.keys(customCategories).some(category => preferences[category] === null)
+      Object.keys(customCategories).some(
+        category => preferences[category] === null,
+      )
     ) {
-      return
+      return;
     }
-    onSave()
-  }
+    onSave();
+  };
 }

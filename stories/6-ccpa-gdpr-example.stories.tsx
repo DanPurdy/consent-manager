@@ -1,19 +1,26 @@
-import React from 'react'
-import cookies from 'js-cookie'
-import { Pane, Heading, Paragraph, Button } from 'evergreen-ui'
-import { ConsentManager, openConsentManager, loadPreferences, onPreferencesSaved } from '../src'
-import { storiesOf } from '@storybook/react'
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { Preferences } from '../src/types'
-import CookieView from './components/CookieView'
-import inRegions from '@segment/in-regions'
-import { CloseBehavior } from '../src/consent-manager/container'
+import React from 'react';
+import cookies from 'js-cookie';
+import { Pane, Heading, Paragraph, Button } from 'evergreen-ui';
+import {
+  ConsentManager,
+  openConsentManager,
+  loadPreferences,
+  onPreferencesSaved,
+} from '../src';
+import { storiesOf } from '@storybook/react';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { Preferences } from '../src/types';
+import CookieView from './components/CookieView';
+import inRegions from '@segment/in-regions';
+import { CloseBehavior } from '../src/consent-manager/container';
+import { preferenceDialogTranslations } from './components/common-react';
 
 const bannerContent = (
   <span>
-    We use cookies (and other similar technologies) to collect data to improve your experience on
-    our site. By using our website, you’re agreeing to the collection of data as described in our{' '}
+    We use cookies (and other similar technologies) to collect data to improve
+    your experience on our site. By using our website, you’re agreeing to the
+    collection of data as described in our{' '}
     <a
       href="https://segment.com/docs/legal/website-data-collection-policy/"
       target="_blank"
@@ -23,15 +30,16 @@ const bannerContent = (
     </a>
     .
   </span>
-)
-const bannerSubContent = 'You can manage your preferences here!'
-const preferencesDialogTitle = 'Website Data Collection Preferences'
+);
+const bannerAcceptButtonContent = 'Yes, I agree';
+const bannerSettingsButtonContent = 'No, take me to settings';
+const preferencesDialogTitle = 'Website Data Collection Preferences';
 const preferencesDialogContent = (
   <div>
     <p>
-      Segment uses data collected by cookies and JavaScript libraries to improve your browsing
-      experience, analyze site traffic, deliver personalized advertisements, and increase the
-      overall performance of our site.
+      Segment uses data collected by cookies and JavaScript libraries to improve
+      your browsing experience, analyze site traffic, deliver personalized
+      advertisements, and increase the overall performance of our site.
     </p>
     <p>
       By using our website, you’re agreeing to our{' '}
@@ -45,15 +53,16 @@ const preferencesDialogContent = (
       .
     </p>
     <p>
-      The table below outlines how we use this data by category. To opt out of a category of data
-      collection, select “No” and save your preferences.
+      The table below outlines how we use this data by category. To opt out of a
+      category of data collection, select “No” and save your preferences.
     </p>
   </div>
-)
-const cancelDialogTitle = 'Are you sure you want to cancel?'
+);
+const cancelDialogTitle = 'Are you sure you want to cancel?';
 const cancelDialogContent = (
   <div>
-    Your preferences have not been saved. By continuing to use our website, you’re agreeing to our{' '}
+    Your preferences have not been saved. By continuing to use our website,
+    you’re agreeing to our{' '}
     <a
       href="https://segment.com/docs/legal/website-data-collection-policy/"
       target="_blank"
@@ -63,53 +72,54 @@ const cancelDialogContent = (
     </a>
     .
   </div>
-)
+);
 
 const ConsentManagerExample = () => {
-  const [prefs, updatePrefs] = React.useState<Preferences>(loadPreferences())
+  const [prefs, updatePrefs] = React.useState<Preferences>(loadPreferences());
 
   const cleanup = onPreferencesSaved(preferences => {
-    updatePrefs(preferences)
-  })
+    updatePrefs(preferences);
+  });
 
   React.useEffect(() => {
     return () => {
-      cleanup()
-    }
-  })
+      cleanup();
+    };
+  });
 
-  const inCA = inRegions(['CA'])
-  const inEU = inRegions(['EU'])
-  const shouldRequireConsent = inRegions(['CA', 'EU'])
+  const inCA = inRegions(['CA']);
+  const inEU = inRegions(['EU']);
+  const shouldRequireConsent = inRegions(['CA', 'EU']);
   const caDefaultPreferences = {
     advertising: false,
     marketingAndAnalytics: true,
-    functional: true
-  }
+    functional: true,
+  };
   const euDefaultPreferences = {
     advertising: false,
     marketingAndAnalytics: false,
-    functional: false
-  }
+    functional: false,
+  };
 
   const closeBehavior = inCA()
     ? _categories => caDefaultPreferences
     : inEU()
-      ? CloseBehavior.DENY
-      : CloseBehavior.ACCEPT
+    ? CloseBehavior.DENY
+    : CloseBehavior.ACCEPT;
 
   const initialPreferences = inCA()
     ? caDefaultPreferences
     : inEU()
-      ? euDefaultPreferences
-      : undefined
+    ? euDefaultPreferences
+    : undefined;
 
   return (
     <Pane>
       <ConsentManager
         writeKey="n2DAIaakJzCUq0saLY0LMcm9dKsqCZvU"
         bannerContent={bannerContent}
-        bannerSubContent={bannerSubContent}
+        bannerAcceptButtonContent={bannerAcceptButtonContent}
+        bannerSettingsButtonContent={bannerSettingsButtonContent}
         preferencesDialogTitle={preferencesDialogTitle}
         preferencesDialogContent={preferencesDialogContent}
         cancelDialogTitle={cancelDialogTitle}
@@ -117,6 +127,7 @@ const ConsentManagerExample = () => {
         closeBehavior={closeBehavior}
         shouldRequireConsent={shouldRequireConsent}
         initialPreferences={initialPreferences}
+        preferenceDialogTranslations={preferenceDialogTranslations}
       />
 
       <Pane marginX={100} marginTop={20}>
@@ -136,13 +147,15 @@ const ConsentManagerExample = () => {
             frameBorder="0"
           />
         </Pane>
-        <Button onClick={() => window.analytics.track('Send Track Event Clicked')}>
+        <Button
+          onClick={() => window.analytics.track('Send Track Event Clicked')}
+        >
           Send Track Event
         </Button>
 
         <Paragraph marginTop={20}>
-          This example highlights checking for EU or CA residency, then changing the closeBehavior
-          based on membership in each.
+          This example highlights checking for EU or CA residency, then changing
+          the closeBehavior based on membership in each.
         </Paragraph>
         <p>
           <div>
@@ -156,8 +169,8 @@ const ConsentManagerExample = () => {
           </Button>
           <Button
             onClick={() => {
-              cookies.remove('tracking-preferences')
-              window.location.reload()
+              cookies.remove('tracking-preferences');
+              window.location.reload();
             }}
           >
             Clear
@@ -166,7 +179,9 @@ const ConsentManagerExample = () => {
       </Pane>
       <CookieView />
     </Pane>
-  )
-}
+  );
+};
 
-storiesOf('CCPA + GDPR Example', module).add(`Basic`, () => <ConsentManagerExample />)
+storiesOf('CCPA + GDPR Example', module).add(`Basic`, () => (
+  <ConsentManagerExample />
+));
