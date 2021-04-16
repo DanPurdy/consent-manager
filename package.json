@@ -1,5 +1,5 @@
 {
-  "name": "@segment/consent-manager",
+  "name": "@danpurdy/constent-manager",
   "version": "5.1.0",
   "description": "Drop-in consent management plugin for analytics.js",
   "keywords": [
@@ -8,7 +8,7 @@
     "analytics",
     "analytics.js"
   ],
-  "repository": "segmentio/consent-manager",
+  "repository": "DanPurdy/consent-manager",
   "license": "MIT",
   "main": "commonjs/index.js",
   "module": "esm/index.js",
@@ -23,7 +23,6 @@
   "scripts": {
     "test": "jest src/__tests__",
     "prepublishOnly": "npm run clean && npm run build",
-    "postpublish": "npm run build-storybook && npm run deploy-storybook -- --existing-output-dir=storybook-static",
     "dev": "concurrently 'npm run build-standalone --watch' 'npm run storybook'",
     "build-commonjs": "tsc --outDir commonjs --module CommonJS --inlineSourceMap",
     "build-esm": "tsc --module es2015 --outDir esm --inlineSourceMap",
@@ -55,7 +54,6 @@
     "@storybook/addon-storysource": "^5.2.3",
     "@storybook/addons": "^5.2.3",
     "@storybook/react": "^5.2.3",
-    "@storybook/storybook-deployer": "^2.8.1",
     "@types/enzyme": "^3.10.3",
     "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/jest": "^24.0.18",
@@ -139,10 +137,5 @@
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all"
-  },
-  "storybook-deployer": {
-    "gitUsername": "GitHub Pages Bot",
-    "gitEmail": "friends@segment.com",
-    "commitMessage": "Deploy Storybook to GitHub Pages [skip ci]"
   }
 }

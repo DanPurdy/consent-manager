@@ -91,6 +91,16 @@ const Container: React.FC<ContainerProps> = props => {
     functionalDestinations,
   } = normalizeDestinations(props.destinations);
 
+  const showDialog = () => toggleDialog(true);
+
+  React.useEffect(() => {
+    emitter.on('openDialog', showDialog);
+
+    return () => {
+      emitter.removeListener('openDialog', showDialog);
+    };
+  });
+
   React.useEffect(() => {
     if (isDialogOpen) {
       props.resetPreferences();
